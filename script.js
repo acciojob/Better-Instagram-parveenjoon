@@ -1,21 +1,43 @@
+
 //your code here
-function drag(event) {
-  event.dataTransfer.setData("text", event.target.id);
+let count = 1;
+let draggingElement = null;
+
+const imgs = document.querySelectorAll("img");
+imgs.forEach((e) => {
+  e.id = `drag${count++}`;
+});
+
+const images = document.querySelectorAll(".image");
+images.forEach((e) => {
+  e.addEventListener("dragstart", onDragStart);
+  e.addEventListener("dragover", onDragOver);
+  e.addEventListener("drop", onDrop);
+});
+
+function onDragStart(event) {
+  draggingElement = event.currentTarget;
 }
 
-document.addEventListener("dragover", function(event) {
-  event.preventDefault();
-});
-
-document.addEventListener("drop", function(event) {
-  event.preventDefault();
-  var data = event.dataTransfer.getData("text");
-  var draggedElement = document.getElementById(data);
-  var dropzone = event.target.closest('.image');
-
-  if (dropzone && dropzone !== draggedElement) {
-    var tempBackground = dropzone.style.backgroundImage;
-    dropzone.style.backgroundImage = draggedElement.style.backgroundImage;
-    draggedElement.style.backgroundImage = tempBackground;
+function onDragOver(event) {
+  if (draggingElement.parentNode.id === event.currentTarget.id) {
+    return;
   }
-});
+  event.preventDefault();
+}
+
+function onDrop(event) {
+  const id = event.currentTarget.id;
+  const bgImg = event.currentTarget.style.backgroundImage;
+  const text = event.currentTarget.innerText;
+
+  event.currentTarget.id = draggingElement.id;
+  event.currentTarget.style.backgroundImage =
+    draggingElement.style.backgroundImage;
+  event.currentTarget.innerText = draggingElement.innerText;
+
+  draggingElement.id = id;
+  draggingElement.style.backgroundImage = bgImg;
+  draggingElement.innerText = text;
+  draggingElement = null;
+}
